@@ -1,0 +1,7 @@
+{
+  "name": "Javascript-Html",
+  "version": "1.0.0",
+  "dependencies": {
+    "@googlemaps/markerclusterer": "^2.0.15"
+  }
+}
