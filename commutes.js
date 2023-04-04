@@ -163,6 +163,19 @@ function Commutes(configuration) {
      * Initializes commutes widget with destinations info if provided with a list
      * of initial destinations and update view.
      */
+
+    // -2.9057595613570073, -78.99670271094904
+    // -2.9060978183181683, -78.9968397969218 pumapungo
+    // -2.903393068203539, -79.01418552067463 claro
+    // -2.9077900000000003, -78.99676000000001
+    // {
+    //     "south": -2.9077900000000003,
+    //         "west": -79.01426000000001,
+    //         "north": -2.9031900000000004,
+    //         "east": -78.99676000000001
+    // }
+
+
     function initDestinations() {
         if (!configuration.initialDestinations) return;
         let callbackCounter = 0;
@@ -196,6 +209,7 @@ function Commutes(configuration) {
                                 let bounds = new google.maps.LatLngBounds();
                                 for (let i = 0; i < destinations.length; i++) {
                                     assignMapObjectListeners(destinations[i], i);
+                                    console.log(destinations[i])
                                     updateCommutesPanel(destinations[i], i, DestinationOperation.ADD);
                                     bounds.union(destinations[i].bounds);
                                 }
@@ -768,11 +782,13 @@ function Commutes(configuration) {
      * Generates new marker based on location and label.
      */
     function createMarker(location, label) {
+
         const isOrigin = label === undefined ? true : false;
         const markerIconConfig = isOrigin ? originMarkerIcon : destinationMarkerIcon;
         const labelColor = isOrigin ? MARKER_ICON_COLORS.active.label :
                 MARKER_ICON_COLORS.inactive.label;
         const labelText = isOrigin ? '●' : label;
+
 
         const mapOptions = {
             position: location,
@@ -791,7 +807,8 @@ function Commutes(configuration) {
             mapOptions.label.fontSize = '20px';
         }
         const marker = new google.maps.Marker(mapOptions);
-        console.log(mapOptions.lat);
+        const l =  marker.position
+
 
         return marker;
     }

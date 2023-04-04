@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<!--
+ @license
+ Copyright 2019 Google LLC. All Rights Reserved.
+ SPDX-License-Identifier: Apache-2.0
+-->
+<html>
+<head>
+    <title>Complex Marker Icons</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script>
+        /**
+         * @license
+         * Copyright 2019 Google LLC. All Rights Reserved.
+         * SPDX-License-Identifier: Apache-2.0
+         */
+        // The following example creates complex markers to indicate beaches near
+        // Sydney, NSW, Australia. Note that the anchor is set to (0,32) to correspond
+        // to the base of the flagpole.
+
+        'use strict';
+
+        const CONFIGURATION = {
+                    "defaultTravelMode": "DRIVING",
+                    "distanceMeasurementType": "IMPERIAL",
+                    "initialDestinations": [
+                        {
+                            "placeId": " ChIJ_fDbQ2sYzZEREArPx4WLcnQ",
+                            "travelMode": "PUBLIC_TRANSIT",
+                        },
+                        {
+                            "placeId": "ChIJr8K_fGoYzZER6-quiYOUOWk",
+                            "travelMode": "WALKING"
+                        }
+                    ],
+                    //jaher   -2.903395589540758, -79.01420684310577
+                    //claro -2.903393068203539, -79.01418552067463
+                    "mapOptions": {"center":{ lat: -2.903393068203539, lng: -79.01418552067463 },"fullscreenControl":true,"mapTypeControl":false,"streetViewControl":false,"zoom":6,"zoomControl":true,"maxZoom":20,"mapId":""},
+                    "mapsApiKey": "AIzaSyBo0gdFXbFrSp1hIdpDdwzoWjt5e1fczBA"
+                };
+
+
+        const MARKER_ICON_COLORS = {
+            active: {
+                fill: '#EA4335',
+                stroke: '#C5221F',
+                label: '#FFF',
+            },
+            inactive: {
+                fill: '#F1F3F4',
+                stroke: '#9AA0A6',
+                label: '#3C4043',
+            },
+        };
+
+        const commutesEl = {
+            map: document.querySelector('.map-view'),
+            initialStatePanel: document.querySelector('.commutes-initial-state'),
+            destinationPanel: document.querySelector('.commutes-destinations'),
+            modal: document.querySelector('.commutes-modal-container'),
+        };
+
+        const mapOptionConfig = CONFIGURATION.mapOptions;
+        let commutesMap;
+
+
+
+
+        function initMap() {
+            //document.getElementById("map")
+            // const map =  new google.maps.Map(document.getElementById("map"), {
+            //     zoom: 8,
+            //     center: { lat: -2.903393068203539, lng: -79.01418552067463 },
+            //     initialStatePanel: document.querySelector('.commutes-initial-state'),
+            // });
+
+            commutesMap = new google.maps.Map(commutesEl.map, mapOptionConfig);
+
+            const markerIconConfig = {
+                path:
+                        'M10 27c-.2 0-.2 0-.5-1-.3-.8-.7-2-1.6-3.5-1-1.5-2-2.7-3-3.8-2.2-2.8-3.9-5-3.9-8.8C1 4.9 5 1 10 1s9 4 9 8.9c0 3.9-1.8 6-4 8.8-1 1.2-1.9 2.4-2.8 3.8-1 1.5-1.4 2.7-1.6 3.5-.3 1-.4 1-.6 1Z',
+                fillOpacity: 1,
+                strokeWeight: 1,
+                anchor: new google.maps.Point(15, 29),
+                scale: 1.2,
+                labelOrigin: new google.maps.Point(10, 9),
+            };
+
+            const destinationMarkerIcon = {
+                ...markerIconConfig,
+                fillColor: MARKER_ICON_COLORS.inactive.fill,
+                strokeColor: MARKER_ICON_COLORS.inactive.stroke,
+            };
+
+
+            const originMarkerIcon = {
+                ...markerIconConfig,
+                fillColor: MARKER_ICON_COLORS.active.fill,
+                strokeColor: MARKER_ICON_COLORS.active.stroke,
+            };
+
+
+
+            let markerIndex = 0;
+
+            function getNextMarkerLabel() {
+                const markerLabels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                const label = markerLabels[markerIndex];
+                markerIndex = (markerIndex + 1) % markerLabels.length;
+                return label;
+            }
+            // new google.maps.Marker({
+            //     position: { lat: -2.903393068203539, lng: -79.01418552067463 },
+            //     map,
+            //     title: 'ORIGIN',
+            //     zIndex: 1,
+            // });
+
+
+
+            createMarker(CONFIGURATION.mapOptions.center);
+            // function createMarker(location, label, map,  MARKER_ICON_COLORS, originMarkerIcon, destinationMarkerIcon  )
+            setMarkers(commutesMap);
+
+            function createMarker(location, label) {
+                const isOrigin = label === undefined ? true : false;
+                const markerIconConfig = isOrigin ? originMarkerIcon : destinationMarkerIcon;
+                const labelColor = isOrigin ? MARKER_ICON_COLORS.active.label :
+                        MARKER_ICON_COLORS.inactive.label;
+                const labelText = isOrigin ? '●' : label;
+
+                const mapOptions = {
+                    position: location,
+                    map: commutesMap,
+                    label: {
+                        text: labelText,
+                        fontFamily: 'Arial, sans-serif',
+                        color: labelColor,
+                        fontSize: '16px',
+                    },
+                    icon: markerIconConfig,
+                    title: 'RUTA INICIAL'
+                };
+
+                if (isOrigin) {
+                    console.log('ESTOY AQUI')
+                    mapOptions.label.className += ' origin-pin-label';
+                    mapOptions.label.fontSize = '100px';
+                }
+                const marker = new google.maps.Marker(mapOptions);
+
+                return marker;
+            }
+
+        }
+
+        // Data for the markers consisting of a name, a LatLng and a zIndex for the
+        // order in which these markers should display on top of each other.
+        const beaches = [
+            ["MOROCHO AGUIRRE DIANA ESTHELA", -2.91193804,	-79.06600034, 4],
+            ["GUAMAN ANA LUCILA", -2.94346650,	-78.92158870, 5],
+            ["FERNANDEZ PESANTEZ INES MARIA", -3.08397030,	-79.01453060, 3],
+        ];
+
+        function setMarkers(map) {
+            // Adds markers to the map.
+            // Marker sizes are expressed as a Size of X,Y where the origin of the image
+            // (0,0) is located in the top left of the image.
+            // Origins, anchor positions and coordinates of the marker increase in the X
+            // direction to the right and in the Y direction down.
+            const image = {
+                url: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png",
+                // This marker is 20 pixels wide by 32 pixels high.
+                size: new google.maps.Size(20, 32),
+                // The origin for this image is (0, 0).
+                origin: new google.maps.Point(0, 0),
+                // The anchor for this image is the base of the flagpole at (0, 32).
+                anchor: new google.maps.Point(0, 32),
+            };
+            // Shapes define the clickable region of the icon. The type defines an HTML
+            // <area> element 'poly' which traces out a polygon as a series of X,Y points.
+            // The final coordinate closes the poly by connecting to the first coordinate.
+            const shape = {
+                coords: [1, 1, 1, 20, 18, 20, 18, 1],
+                type: "poly",
+            };
+
+
+            ///////////////////////////////////
+
+            const markerIconConfig = {
+                path:
+                        'M10 27c-.2 0-.2 0-.5-1-.3-.8-.7-2-1.6-3.5-1-1.5-2-2.7-3-3.8-2.2-2.8-3.9-5-3.9-8.8C1 4.9 5 1 10 1s9 4 9 8.9c0 3.9-1.8 6-4 8.8-1 1.2-1.9 2.4-2.8 3.8-1 1.5-1.4 2.7-1.6 3.5-.3 1-.4 1-.6 1Z',
+                fillOpacity: 1,
+                strokeWeight: 1,
+                anchor: new google.maps.Point(15, 29),
+                scale: 1.2,
+                labelOrigin: new google.maps.Point(10, 9),
+            };
+
+            const destinationMarkerIcon = {
+                ...markerIconConfig,
+                fillColor: MARKER_ICON_COLORS.inactive.fill,
+                strokeColor: MARKER_ICON_COLORS.inactive.stroke,
+            };
+
+
+            const originMarkerIcon = {
+                ...markerIconConfig,
+                fillColor: MARKER_ICON_COLORS.active.fill,
+                strokeColor: MARKER_ICON_COLORS.active.stroke,
+            };
+
+            const commutesEl = {
+                map: document.querySelector('.map-view'),
+                initialStatePanel: document.querySelector('.commutes-initial-state'),
+                destinationPanel: document.querySelector('.commutes-destinations'),
+                modal: document.querySelector('.commutes-modal-container'),
+            };
+            const mapOptionConfig = CONFIGURATION.mapOptions;
+
+            let commutesMap = new google.maps.Map(map, mapOptionConfig);
+
+            let markerIndex = 0;
+
+            function getNextMarkerLabel() {
+                const markerLabels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                const label = markerLabels[markerIndex];
+                markerIndex = (markerIndex + 1) % markerLabels.length;
+                return label;
+            }
+
+
+            //
+
+            ////////////////////////////////////
+
+
+
+            for (let i = 0; i < beaches.length; i++) {
+                const beach = beaches[i];
+
+
+                new google.maps.Marker({
+                    position: { lat: beach[1], lng: beach[2] },
+                    map,
+                    icon: image,
+                    shape: shape,
+                    title: beach[0],
+                    zIndex: beach[3],
+                });
+            }
+        }
+
+
+
+
+
+
+        ///////////////////////////////////////////////////////
+
+
+
+        function getCommutesInfo(directionResponse, destination) {
+            if (!directionResponse) return;
+            const path = directionResponse.routes[0].overview_path;
+            const bounds = directionResponse.routes[0].bounds;
+            const directionLeg = directionResponse.routes[0].legs[0];
+            const destinationLocation = directionLeg.end_location;
+            const distance = directionLeg.distance.text;
+            const duration = convertDurationValueAsString(directionLeg.duration.value);
+
+            const innerStroke = new google.maps.Polyline({
+                path: path,
+                strokeColor: STROKE_COLORS.inactive.innerStroke,
+                strokeOpacity: 1.0,
+                strokeWeight: 3,
+                zIndex: 10
+            });
+
+            const outerStroke = new google.maps.Polyline({
+                path: path,
+                strokeColor: STROKE_COLORS.inactive.outerStroke,
+                strokeOpacity: 1.0,
+                strokeWeight: 6,
+                zIndex: 1
+            });
+
+            const marker = createMarker(destinationLocation, destination.label);
+
+            //innerStroke.setMap(commutesMap);
+            outerStroke.setMap(commutesMap);
+
+            destination.distance = distance;
+            destination.duration = duration;
+            destination.marker = marker;
+            destination.polylines = {innerStroke, outerStroke};
+            destination.bounds = bounds;
+        }
+
+
+        window.initMap = initMap;
+    </script>
+    <style>
+        /**
+         * @license
+         * Copyright 2019 Google LLC. All Rights Reserved.
+         * SPDX-License-Identifier: Apache-2.0
+         */
+        /*
+          * Always set the map height explicitly to define the size of the div element
+          * that contains the map.
+          */
+        #map {
+            height: 100%;
+        }
+
+        /*
+        * Optional: Makes the sample page fill the window.
+        */
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<!--<script-->
+<!--        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBo0gdFXbFrSp1hIdpDdwzoWjt5e1fczBA&callback=initMap&v=weekly"-->
+<!--        defer-->
+<!--&gt;</script>-->
+
+<script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBo0gdFXbFrSp1hIdpDdwzoWjt5e1fczBA&callback=initMap&libraries=places,geometry&solution_channel=GMP_QB_commutes_v2_c"
+        async defer>
+
+</script>
+
+</body>
+</html>
