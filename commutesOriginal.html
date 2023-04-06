@@ -903,7 +903,7 @@
                             const destinationConfig =
                                     createDestinationConfig(place, travelModeEnum, label);
                             getDirections(destinationConfig).then((response) => {
-                                console.log('L9104: ', response);
+                                console.log('L9104: ', destinationConfig);
                                 if (!response) return;
                                 destinations.push(destinationConfig);
                                 getCommutesInfo(response, destinationConfig);

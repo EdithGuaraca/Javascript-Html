@@ -1121,6 +1121,7 @@
 
 
                                 destinations.push(waypts);
+                                console.log('L1124: ', destinations);
 
                                 console.log('L1120: ', destinations[0])
                                 getCommutesInfoRuta(response, destinationConfig);
@@ -1132,7 +1133,6 @@
                                 if ((callbackCounter-1) === (destination[0].length)) {
                                     console.log('L1144: ', destinations[0])
                                     destinations[0].sort(function (a, b) {
-                                        console.log('estoy aqui')
                                         return a.label < b.label ? -1 : 1;
                                     });
                                     let bounds = new google.maps.LatLngBounds();
@@ -1150,6 +1150,7 @@
                         () => {
                             console.error('Failed to retrieve places info due to ' + e);
                         });
+
 
         }
 
