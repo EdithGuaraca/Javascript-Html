@@ -833,14 +833,9 @@
         let commutesMap;
         let activeDestinationIndex;
         let origin = configuration.mapOptions.center;
-        let destinations =  [];
+        let destinations = configuration.destination || [];
         let markerIndex = 0;
         let lastActiveEl;
-        let i = 0;
-        let destination ={};
-
-        const waypts = [];
-        let destinationWP=[];
 
         const markerIconConfig = {
             path:
@@ -864,144 +859,33 @@
         const bikeLayer = new google.maps.BicyclingLayer();
         const publicTransitLayer = new google.maps.TransitLayer();
 
-        const geocoder = new google.maps.Geocoder();
-
-
-        const params = [
-            {name: 'Mi Ubicación',lat:configuration.mapOptions.center.lat,lng:configuration.mapOptions.center.lng},
-            {name: 'MOROCHO AGUIRRE DIANA ESTHELA',lat: -2.91193804,lng: -79.06600034},
-            {name: 'GUAMAN ANA LUCILA',lat: -2.94346650,lng: -78.92158870},
-            {name: 'PUGO PULLO IVAN PATRICIO',lat: -2.89646471,lng: -79.03715261},
-            // {name: 'BERMEO CHACON BYRON ALEJANDRO',lat: -2.90335575,lng: -78.99461023},
-            // {name: 'CACERES ORELLANA MARIA ANGELITA',lat: -2.90818080,lng: -79.01135110},
-            // {name: 'ARIZAGA OLGA BEATRIZ',lat: -2.88285629,lng:-79.02090834},
-            // {name: 'ROBLES MORENO FRANCISCO XAVIER',lat:-2.92044214,lng: -79.04934553},
-            // {name: 'NAULAGUARI PANJON  LUIS ALBERTO',lat:-2.91456478,lng: -79.06494705},
-            // {name: 'QUITO PLAZA A EDWIN EDUARDO',lat:-2.85653988,lng: -79.04188393},
-            // {name: 'VELETANGA GUANGA LAURA FERNANDA',lat:-2.88340340,lng: -79.04879180},
-            // {name: 'LOPEZ VELETANGA ANA GABRIELA',lat:-2.88038399,lng: -79.05199105},
-            // {name: 'CABRERA VILLALVA  JOSELINE DOLORES',lat:-2.89454780,lng:-79.05973870},
-            // {name: 'ANTON GOMEZ JUAN MARCELO',lat:-2.89679309,lng:-78.93538260},
-            // {name: 'LOJA VILLA SONIA MARIBEL',lat:-2.84770967,lng:-79.02675068},
-            // {name: 'PLAZA ALVARRACIN CARLOS AQUILEO',lat:-2.87705300,lng: -79.06088280},
-            // {name: 'GUAMAN GUAMAN ELIZA PIEDAD',lat:-2.81250320,lng: -79.00216530},
-            // {name:'BARROS CRIOLLO BRYAM DARIO',lat:-2.87140840,lng:-78.98191930},
-            // {name:'AREVALO PARAPI MARIA ELVA',lat:-2.87167872,lng:-78.98203280},
-            // {name:'AUCAY MALDOMADO EUFROSINA EMPERATRIZ',lat:-2.93999709,lng:-79.02168253},
-            // {name:'BENAVIDES ROMERO MONICA ELIZABETH', lat: -2.88551758, lng: -79.04949064},
-            // {name:'CACERES ORELLANA MARIA ANGELITA', lat: -2.90818080, lng: -79.01135110},
-            // {name:'GUAZHA BELTRAN CHRISTIAN MANUEL', lat: -2.89587220, lng: -79.02318520},
-            // {name:'GUAMAN MERCHAN SAUL MARIA', lat: -3.03905080, lng: -79.04490720},
-            // {name:'MISACANGO LEON BIBIANA DE JESUS', lat: -2.87533200, lng: -79.06997820},
-            // {name: 'AREVALO PARAPI MARIA ELVA', lat: -2.87167872, lng: -78.98203280}
-        ]
-
-        console.log('PARAMS: ', params.length);
-
-
-
         initMapView();
-        // initDestinations();
+        initDestinations();
         initCommutesPanel();
         initCommutesModal();
-        //geocodeLatLng(geocoder, 2);
-
-        initDestinationsRuta();
-
-
-
-        async function geocodeLatLng(geocoder) {
-
-
-               for (let j =1 ; j <params.length; j++){
-                   const latlng = {
-                       lat: params[j].lat,
-                       lng: params[j].lng
-                   }
-
-                   const datos = await geocoder.geocode({ location: latlng });
-                   // console.log('DATOS: ', datos, '-',j, '-', latlng);
-
-
-                   waypts.push({
-                       location:  datos.results[0].formatted_address,
-                       stopover: true,
-                   });
-                    destinationWP.push({
-                       "placeId": datos.results[0].place_id,
-                       "travelMode": "DRIVING",
-                       "address": datos.results[0].formatted_address,
-                       "owner": params[j].name,
-                       "lat": latlng.lat,
-                       "lng": latlng.lng,
-                        "waypts": {
-                            location:  datos.results[0].formatted_address,
-                            stopover: true,
-                        }
-                   });
-
-                 // configuration.initialDestinations.push(destinationWP);
-
-               }
-               const latLngO ={
-                   lat:params[0].lat,
-                   lng:params[0].lng
-               }
-
-               const datos = await geocoder.geocode({ location: latLngO });
-               return destination = {
-                   "placeId": datos.results[0].place_id,
-                   "travelMode": "DRIVING",
-                   "address": datos.results[0].formatted_address,
-                   "owner": params[0].name,
-                   "lat": latLngO.lat,
-                   "lng": latLngO.lng,
-                   "waypts": waypts,
-                   "destinationWP": destinationWP,
-               }
-
-
-            console.log('L943: ', destination);
-           // initDestinationsRuta();
-
-        }
-
 
         /**
-         * Initializes map view on commutes' widget.
+         * Initializes map view on commutes widget.
          */
         function initMapView() {
             const mapOptionConfig = configuration.mapOptions;
             commutesMap = new google.maps.Map(commutesEl.map, mapOptionConfig);
 
             configuration.defaultTravelModeEnum =
-            parseTravelModeEnum(configuration.defaultTravelMode);
+                    parseTravelModeEnum(configuration.defaultTravelMode);
             setTravelModeLayer(configuration.defaultTravelModeEnum);
-           // console.log('L887: ',origin);
             createMarker(origin);
-
-
         }
-
-
 
         /**
          * Initializes commutes widget with destinations info if provided with a list
          * of initial destinations and update view.
          */
         function initDestinations() {
-
-           // console.log('**************ESTOY AQUI************************')
-            let j =0;
-            let d = {};
-
             if (!configuration.initialDestinations) return;
-
-            //console.log('L966:**************ESTOY AQUI************************: ', configuration.initialDestinations);
             let callbackCounter = 0;
             const placesService = new google.maps.places.PlacesService(commutesMap);
             for (const destination of configuration.initialDestinations) {
-               //console.log('L970: ', destination)
                 destination.travelModeEnum = parseTravelModeEnum(destination.travelMode);
                 const label = getNextMarkerLabel();
                 const request = {
@@ -1012,39 +896,29 @@
                         request,
                         function(place) {
                             if (!place.geometry || !place.geometry.location) return;
+
+                            console.log('L1095: ', place);
                             const travelModeEnum =
                                     destination.travelModeEnum || configuration.defaultTravelModeEnum;
-                            const title = destination.owner + ' - ' + destination.address +'\n' + destination.lat + ',' + destination.lng ;
-                           // console.log('NAME: ', title)
                             const destinationConfig =
-                                    createDestinationConfig(place, travelModeEnum, label, title);
-
-
-                            const miPromesa = new Promise((resolve, reject) => {
-                                setTimeout(() => {
-                                    resolve(place.geometry.location.lng());
-                                }, 300);
-                            });
-
-                           // miPromesa.then(e=> console.log('L912 ',e))
-
-
+                                    createDestinationConfig(place, travelModeEnum, label);
                             getDirections(destinationConfig).then((response) => {
+                                console.log('L9104: ', response);
                                 if (!response) return;
                                 destinations.push(destinationConfig);
-                             //console.log('L1003: ',response);
                                 getCommutesInfo(response, destinationConfig);
-                             //   console.log('L919 ',response);
                                 callbackCounter++;
                                 // Update commutes panel and click event objects after getting
                                 // direction to all destinations.
+
+                                console.log('destinations: ',destinationConfig);
                                 if (callbackCounter === configuration.initialDestinations.length) {
                                     destinations.sort(function(a, b) {
                                         return a.label < b.label ? -1 : 1;
                                     });
+                                    console.log('L914: ', destinations);
                                     let bounds = new google.maps.LatLngBounds();
                                     for (let i = 0; i < destinations.length; i++) {
-                                 //       console.log('L920 ', destinations);
                                         assignMapObjectListeners(destinations[i], i);
                                         updateCommutesPanel(destinations[i], i, DestinationOperation.ADD);
                                         bounds.union(destinations[i].bounds);
@@ -1060,100 +934,6 @@
                         });
             }
         }
-
-       async function initDestinationsRuta() {
-
-            // console.log('**************ESTOY AQUI************************')
-
-
-            //if (!configuration.initialDestinations) return;
-
-            //console.log('L966:**************ESTOY AQUI************************: ', configuration.initialDestinations);
-            let callbackCounter = 0;
-            const placesService = new google.maps.places.PlacesService(commutesMap);
-            const destination = await geocodeLatLng(geocoder);
-
-                destination.travelModeEnum = parseTravelModeEnum(destination.travelMode);
-                const label = getNextMarkerLabel();
-
-                const request = {
-                    placeId: destination.placeId,
-                    fields: ['place_id', 'geometry', 'name'],
-                };
-                placesService.getDetails(
-                        request,
-                        function(place) {
-                            if (!place.geometry || !place.geometry.location) return;
-                            const travelModeEnum =
-                                    destination.travelModeEnum || configuration.defaultTravelModeEnum;
-                            const title = destination.owner + ' - ' + destination.address +'\n' + destination.lat + ',' + destination.lng ;
-                            const destinationConfig =
-                                    createDestinationConfig(place, travelModeEnum, label, title);
-
-                            // const miPromesa = new Promise((resolve, reject) => {
-                            //     setTimeout(() => {
-                            //         resolve(place);
-                            //     }, 300);
-                            // });
-                            //
-                            //  miPromesa.then(e=> console.log('L1105 ',e))
-                            getDirectionsRuta(destinationConfig).then( (response) => {
-
-                                if (!response) return;
-
-                                for (let e = 0; e < destination.destinationWP.length; e++) {
-                                    callbackCounter++;
-                                    const requestWP = {
-                                        placeId: destination.destinationWP[e].placeId,
-                                        fields: ['place_id', 'geometry', 'name'],
-                                    };
-                                    const titleWP = destination.destinationWP[e].owner;
-                                    let destinationConfigDest = {}
-                                    // placesService.getDetails(
-                                    //         requestWP,
-                                    //          function (place) {
-                                    //              destinationConfigDest =
-                                    //                     createDestinationConfig(place, travelModeEnum, label, titleWP);
-                                    //             destinations.push(destinationConfigDest);
-                                    //         });
-
-                            }
-
-
-                                destinations.push(waypts);
-
-                                console.log('L1120: ', destinations[0])
-                                getCommutesInfoRuta(response, destinationConfig);
-                                callbackCounter++;
-                                // Update commutes panel and click event objects after getting
-                                // direction to all destinations.
-                                // if (callbackCounter === configuration.initialDestinations.length) {
-                                console.log('L1128: ', destinations[0].length + ' --- ' + callbackCounter)
-                                if ((callbackCounter-1) === (destination[0].length)) {
-                                    console.log('L1144: ', destinations[0])
-                                    destinations[0].sort(function (a, b) {
-                                        console.log('estoy aqui')
-                                        return a.label < b.label ? -1 : 1;
-                                    });
-                                    let bounds = new google.maps.LatLngBounds();
-                                    for (let i = 0; i < destinations.length; i++) {
-                                        assignMapObjectListeners(destinations[i], i);
-                                        updateCommutesPanel(destinations[i], i, DestinationOperation.ADD);
-                                        bounds.union(destinations[i].bounds);
-                                    }
-                                    const lastIndex = destinations.length - 1;
-                                    handleRouteClick(destinations[lastIndex], lastIndex);
-                                    commutesMap.fitBounds(bounds);
-                                }
-                            });
-                        },
-                        () => {
-                            console.error('Failed to retrieve places info due to ' + e);
-                        });
-
-        }
-
-
 
         /**
          * Initializes the bottom panel for updating map view and displaying commutes
@@ -1198,6 +978,7 @@
                 east: origin.lng + BIAS_BOUND_DISTANCE,
                 west: origin.lng - BIAS_BOUND_DISTANCE,
             };
+
             const destinationFormReset = function() {
                 destinationModalEl.destinationInput.classList.remove('error');
                 destinationModalEl.errorMessage.innerHTML = '';
@@ -1211,21 +992,9 @@
             };
             const autocomplete = new google.maps.places.Autocomplete(
                     destinationModalEl.destinationInput, autocompleteOptions);
-
-
             let destinationToAdd;
             autocomplete.addListener('place_changed', () => {
                 const place = autocomplete.getPlace();
-
-                const miPlace = new Promise((resolve, reject) => {
-                    setTimeout(() => {
-                        resolve(place.geometry.location.lat());
-                    }, 300);
-                });
-
-                // miPlace.then(e=> console.log('L1018 ',e))
-
-
                 if (!place.geometry || !place.geometry.location) {
                     return;
                 } else {
@@ -1237,13 +1006,10 @@
             });
 
             destinationModalEl.addButton.addEventListener('click', () => {
-                // console.log('L1019: ', destinationToAdd);
                 const isValidInput = validateDestinationInput(destinationToAdd);
-                // console.log('L1020: ', isValidInput);
                 if (!isValidInput) return;
                 const selectedTravelMode = destinationModalEl.getTravelModeInput().value;
                 addDestinationToList(destinationToAdd, selectedTravelMode);
-                // console.log('L1023: ', destinationToAdd);
                 destinationFormReset();
                 hideModal();
             });
@@ -1386,7 +1152,6 @@
          * than max number places are added.
          */
         function validateDestinationInput(destinationToAdd) {
-            // console.log('L1166: ', destinationToAdd);
             let errorMessage;
             let isValidInput = false;
             if (!destinationToAdd) {
@@ -1510,26 +1275,19 @@
          * Adds new destination to the list and get directions and commutes info.
          */
         function addDestinationToList(destinationToAdd, travelModeEnum) {
-
-            console.log('1500: ', destinationToAdd)
             const destinationConfig =
                     createDestinationConfig(destinationToAdd, travelModeEnum);
-
-          //  console.log('L1461: ', destinationConfig);
             const newDestinationIndex = destinations.length;
             getDirections(destinationConfig)
                     .then((response) => {
                         if (!response) return;
                         destinations.push(destinationConfig);
                         getCommutesInfo(response, destinationConfig);
-                      //  console.log('L1468: ', response);
                         assignMapObjectListeners(destinationConfig, newDestinationIndex);
                         updateCommutesPanel(
                                 destinationConfig, newDestinationIndex, DestinationOperation.ADD);
                         handleRouteClick(destinationConfig, newDestinationIndex);
                         destinationPanelEl.addButton.focus();
-
-                        // console.log('L1349', destinationConfig);
                     })
                     .catch((e) => console.error('Adding destination failed due to ' + e));
         }
@@ -1549,18 +1307,16 @@
          * Creates a destination config object from the given data. The label argument
          * is optional; a new label will be generated if not provided.
          */
-        function createDestinationConfig(destinationToAdd, travelModeEnum, label, title) {
+        function createDestinationConfig(destinationToAdd, travelModeEnum, label) {
 
+            console.log('L1308: ', destinationToAdd);
             return {
-
                 name: destinationToAdd.name,
                 place_id: destinationToAdd.place_id,
                 label: label || getNextMarkerLabel(),
                 travelModeEnum: travelModeEnum,
-                owner: title,
-                url: generateMapsUrl(destinationToAdd, travelModeEnum)
+                url: generateMapsUrl(destinationToAdd, travelModeEnum),
             };
-
         }
 
         /**
@@ -1575,37 +1331,12 @@
                 unitSystem: configuration.distanceMeasurementType === 'METRIC' ?
                         google.maps.UnitSystem.METRIC : google.maps.UnitSystem.IMPERIAL,
             };
-
-
             const directionsService = new google.maps.DirectionsService();
-
             return directionsService.route(request).then(response => {
+                console.log(response)
                 return response;
             });
         }
-
-        function getDirectionsRuta(destination) {
-            const request = {
-                origin: origin,
-                destination: {'placeId': destination.place_id},
-                waypoints: waypts,
-                optimizeWaypoints: true,
-                travelMode: google.maps.TravelMode.DRIVING,//destination.travelModeEnum,
-                unitSystem: configuration.distanceMeasurementType === 'METRIC' ?
-                        google.maps.UnitSystem.METRIC : google.maps.UnitSystem.IMPERIAL,
-            };
-
-            const directionsService = new google.maps.DirectionsService();
-            const directionsRenderer = new google.maps.DirectionsRenderer();
-
-            //directionsRenderer.setMap(commutesMap);
-
-            return directionsService.route(request).then(response => {
-                //directionsRenderer.setDirections(response);
-                return response;
-            });
-        }
-
 
         /**
          * Adds route polyline, marker, and commutes info to map and destinations
@@ -1636,8 +1367,7 @@
                 zIndex: 1
             });
 
-            const title = destination.owner
-            const marker = createMarker(destinationLocation, destination.label, title);
+            const marker = createMarker(destinationLocation, destination.label);
 
             innerStroke.setMap(commutesMap);
             outerStroke.setMap(commutesMap);
@@ -1647,52 +1377,6 @@
             destination.marker = marker;
             destination.polylines = {innerStroke, outerStroke};
             destination.bounds = bounds;
-        }
-
-        function getCommutesInfoRuta(directionResponse, destination) {
-            if (!directionResponse) return;
-
-            for(let i =0; i<directionResponse.routes[0].legs.length;i++){
-
-                const path = directionResponse.routes[0].overview_path;
-                const bounds = directionResponse.routes[0].bounds;
-                const directionLeg = directionResponse.routes[0].legs[i];
-                const destinationLocation = directionLeg.end_location;
-                const distance = directionLeg.distance.text;
-                const duration = convertDurationValueAsString(directionLeg.duration.value);
-                const address = directionLeg.end_address;
-                let label = getNextMarkerLabel();
-
-                const innerStroke = new google.maps.Polyline({
-                    path: path,
-                    strokeColor: STROKE_COLORS.inactive.innerStroke,
-                    strokeOpacity: 1.0,
-                    strokeWeight: 3,
-                    zIndex: 10
-                });
-
-                const outerStroke = new google.maps.Polyline({
-                    path: path,
-                    strokeColor: STROKE_COLORS.inactive.outerStroke,
-                    strokeOpacity: 1.0,
-                    strokeWeight: 6,
-                    zIndex: 1
-                });
-
-                const title = address;
-                const marker = createMarker(destinationLocation,label, title);
-
-                innerStroke.setMap(commutesMap);
-                innerStroke.setMap(commutesMap);
-                outerStroke.setMap(commutesMap);
-
-                destination.distance = distance;
-                destination.duration = duration;
-                destination.marker = marker;
-                destination.polylines = {innerStroke, outerStroke};
-                destination.bounds = bounds;
-
-            }
         }
 
         /**
@@ -1805,16 +1489,14 @@
             destination.marker.label.color = '#ffffff';
 
             commutesMap.fitBounds(destination.bounds);
-
         }
 
         /**
          * Generates new marker based on location and label.
          */
-        function createMarker(location, label, titleLabel) {
+        function createMarker(location, label) {
             const isOrigin = label === undefined ? true : false;
             const markerIconConfig = isOrigin ? originMarkerIcon : destinationMarkerIcon;
-            // console.log('L1816: ',isOrigin);
             const labelColor = isOrigin ? MARKER_ICON_COLORS.active.label :
                     MARKER_ICON_COLORS.inactive.label;
             const labelText = isOrigin ? '●' : label;
@@ -1827,10 +1509,8 @@
                     fontFamily: 'Arial, sans-serif',
                     color: labelColor,
                     fontSize: '16px',
-                    title: location
                 },
-                icon: markerIconConfig,
-                title: titleLabel
+                icon: markerIconConfig
             };
 
             if (isOrigin) {
@@ -1839,7 +1519,7 @@
             }
             const marker = new google.maps.Marker(mapOptions);
 
-            return marker ;
+            return marker;
         }
 
         /**
@@ -1982,6 +1662,7 @@
           <div class="destination-content">
             <div class="metadata">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                   ${travelModeIconTemplate}
               </svg>
               ${destination.distance}
@@ -1991,7 +1672,7 @@
               <span class="location-marker">${destination.label}</span>
             </div>
             <div class="address">To
-              <abbr title="${destination.name}">${destination.name}</abbr>
+              <abbr title="${destination.name}">${destination.name + 'Estoy aqui'}</abbr>
             </div>
             <div class="destination-eta">${destination.duration}</div>
           </div>
@@ -2012,8 +1693,6 @@
           </button>
         </div>`;
     }
-
-
 </script>
 <script>
     const CONFIGURATION = {
@@ -2041,6 +1720,5 @@
     }
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBo0gdFXbFrSp1hIdpDdwzoWjt5e1fczBA&callback=initMap&libraries=places,geometry&solution_channel=GMP_QB_commutes_v2_c" async defer></script>
-
 </body>
 </html>
